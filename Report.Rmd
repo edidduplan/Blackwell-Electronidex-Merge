@@ -34,28 +34,32 @@ pacman::p_load(tidyverse, caret, readr, VIM, rstudioapi, arules, arulesViz,
 ```
 
 ```{r}
+current_path <- getActiveDocumentContext()$path
+setwd(dirname(current_path))
+
+```
+
+```{r}
 # Importing data
 # Set working directory
-# current_path = getActiveDocumentContext()$path
-# setwd("C:/Users/edison/Documents/Ubiqum/Data Analytics Course/Module II/Task4/")
 
 # Electronidex transactional data
 
-ElectronidexTrans2017_df <- read.csv("C:/Users/edison/Documents/Ubiqum/Data Analytics Course/Module II/Task4/ElectronidexTransactions2017.csv", 
-                                     header = F, sep = ",", strip.white = T)
+ElectronidexTrans2017_df <- read.csv("ElectronidexTransactions2017.csv", 
+                                      header = F, sep = ",", strip.white = T)
 
-ElectronidexTrans2017 <- read.transactions("C:/Users/edison/Documents/Ubiqum/Data Analytics Course/Module II/Task4/ElectronidexTransactions2017.csv", 
+ElectronidexTrans2017 <- read.transactions("ElectronidexTransactions2017.csv", 
                                            header = F, sep = ",", 
                                            format = "basket", 
                                            rm.duplicates = T)
 
 # Product Type key file
-ProductType_key <- read.csv("C:/Users/edison/Documents/Ubiqum/Data Analytics Course/Module II/Task4/ProductType_csv.csv", header = T, sep = ";")
+ProductType_key <- read.csv("ProductType_csv.csv", header = T, sep = ";")
 
 # Blackwell product data
-existingprod <- read.csv("C:/Users/edison/Documents/Ubiqum/Data Analytics Course/Module II/Task4/Data_BW/existingproductattributes2017.csv")
+existingprod <- read.csv("Data_BW/existingproductattributes2017.csv")
 
-newprod <- read.csv("C:/Users/edison/Documents/Ubiqum/Data Analytics Course/Module II/Task4/Data_BW/newprod_pred.csv", header = T)
+newprod <- read.csv("Data_BW/newprod_pred.csv", header = T, sep = ";")
 
 ```
 
@@ -72,7 +76,7 @@ existingprod$ProfitMonthly <- existingprod$Volume * existingprod$Price *
 # Merging existing with new products in one data frame
 newprod$Volume <- NULL
 colnames(newprod)[colnames(newprod) == "finalpredictedvolume"] <- "Volume"
-
+ncol(newprod)
 blackwell_prod <- rbind(existingprod, newprod)
 levels(blackwell_prod$ProductType)[2] <- "Monitor"
 levels(blackwell_prod$ProductType)[7] <- "Desktop"
@@ -116,10 +120,6 @@ elec_volume <- elec_volume[order(elec_volume$product_name),]
 
 # Merging product type to elec_volume
 checking_vector <- c()
-checking_vector
-str(checking_vector)
-str(elec_volume)
-str(ProductType_key)
 
 for (i in 1:125){
   checking_vector[i] <- ProductType_key[i,1] == elec_volume[i,1]
@@ -160,7 +160,7 @@ ggplot(elec_volume, aes(x=product_type, y=volume, fill = product_type)) +
 # levels(blackwell_prod$ProductType)[(levels(blackwell_prod$ProductType) == 
 #                                     "Netbook")] <- "Laptop&Netbook"
 
-ggplot(blackwell_prod, aes(x = ProductType, y = Volume, fill = ProductType)) +
+ggplot(blackwell_prod, aes(x = ProductType, y = Volume, fill = ProfitMonthly)) +
   geom_bar(stat = "identity") +
   ggtitle("BW's products (whole portfolio) - sales volume")
 
@@ -209,6 +209,13 @@ Ploting the estimated monthly profit of Electronidex per product type.
 ggplot(elec_volume_profit, aes(x = product_type, y = profit, fill = product_type)) +
   geom_bar(stat = "identity") +
   ggtitle("Elec's products (whole portfolio) - Profit")
+
+ggplot(elec_volume_profit, aes(x = product_type, y = volume, fill = profit)) +
+  geom_bar(stat = "identity") +
+  ggtitle("Elec's products (whole portfolio) - volume")
+
+sum(elec_volume$volume)
+sum(blackwell_prod$Volume)
 ```
 
 # Spliting the data
@@ -355,6 +362,22 @@ The 5 most relevant rules in B2B are:
 [3]	{Accessories}	=>	{Desktop}	
 [4]	{Desktop}	=>	{Accessories}	
 [5]	{Laptop}	=>	{Desktop}	
+
+# Association rules including gaming products
+
+```{r}
+association_rules_b2b <- apriori(ElectronidexTrans2017_B2B, 
+                             parameter = list(supp = 0.008, conf = 0.8, 
+                                              minlen = 2))
+
+head(inspect(sort(association_rules_b2b, by = "lift")),5)
+```
+
+
+
+
+
+
 
 # Annex
 
