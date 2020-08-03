@@ -1,1 +1,2 @@
-Modul2-Task4
+Project Blackwell-Electronidex merge
+Analysing sinergies between two companies

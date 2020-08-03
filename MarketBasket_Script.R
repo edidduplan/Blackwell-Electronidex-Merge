@@ -123,6 +123,8 @@ summaryElec[1,1] <- "Intel Desktop"
 summaryElec$Var1 <- as.factor(summaryElec$Var1)
 rownames(summaryElec) <- NULL
 
+order(summaryElec$Freq, summaryElec$Var1)
+summaryElec[order(summaryElec$Freq, summaryElec$Var1),]
 summaryElec <- summaryElec[order(summaryElec$Var1),]
 rownames(summaryElec) <- NULL
 
