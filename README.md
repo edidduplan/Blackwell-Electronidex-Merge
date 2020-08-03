@@ -1,2 +1,2 @@
-Modul2-Task4
-Final script is in Report.rmd
+Project Blackwell-Electronidex merge
+Analysing sinergies between two companies
